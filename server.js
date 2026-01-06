@@ -73,11 +73,27 @@ app.get("/u/:token", async (req, res) => {
   },
   });
 
+  let remainingDays = 0;
+
+if (user.subscription) {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  const end = new Date(user.subscription.endDate);
+  end.setHours(0, 0, 0, 0);
+
+  remainingDays = Math.ceil(
+    (end - today) / (1000 * 60 * 60 * 24)
+  );
+}
+
+
 
   res.render("customer", {
     name: user.name,
     token: user.token,
     todayMenu: menu,
+    remainingDays,
   });
 });
 

@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Roll Bowl – Kitchen Summary</title>
+  </head>
+  <body>
+    <h1>Kitchen Summary (Tomorrow)</h1>
+
+    <% if (Object.keys(summary).length === 0) { %>
+      <p>No orders yet.</p>
+    <% } else { %>
+      <ul>
+        <% for (let item in summary) { %>
+          <li>
+            <strong><%= item %></strong> × <%= summary[item] %>
+          </li>
+        <% } %>
+      </ul>
+    <% } %>
+  </body>
+</html>

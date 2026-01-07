@@ -1,16 +1,8 @@
 const express = require("express");
+const bodyParser = require("body-parser");
 const { PrismaClient } = require("@prisma/client");
+const { v4: uuidv4 } = require("uuid");
 
-import express from "express";
-import bodyParser from "body-parser";
-import { PrismaClient } from "@prisma/client";
-
-let uuidv4;
-
-(async () => {
-  const uuid = await import("uuid");
-  uuidv4 = uuid.v4;
-})();
 
 
 const app = express();

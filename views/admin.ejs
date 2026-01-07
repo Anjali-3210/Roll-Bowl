@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Roll Bowl Admin</title>
+  </head>
+  <body>
+    <h1>Roll Bowl – Admin Dashboard</h1>
+
+    <h2>Tomorrow Meal Count</h2>
+    <p>Total meals to prepare: <%= count %></p>
+
+    <h2>Users Eating Tomorrow</h2>
+
+    <% if (users.length === 0) { %>
+      <p>No votes yet</p>
+    <% } else { %>
+      <ul>
+        <% users.forEach(u => { %>
+          <li>
+            <strong><%= u.name %></strong>
+            —
+            <em><%= u.choice || "No choice selected" %></em>
+          </li>
+        <% }) %>
+      </ul>
+    <% } %>
+  </body>
+</html>
+

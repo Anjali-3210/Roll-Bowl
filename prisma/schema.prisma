@@ -1,0 +1,47 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            Int           @id @default(autoincrement())
+  name          String
+  token         String?       @unique
+  subscription  Subscription?
+  votes         Vote[]
+}
+
+model Subscription {
+  id        Int      @id @default(autoincrement())
+  startDate DateTime
+  endDate   DateTime
+  userId    Int      @unique
+  user      User     @relation(fields: [userId], references: [id])
+}
+
+model Menu {
+  id    Int      @id @default(autoincrement())
+  date  DateTime @unique
+  items String
+}
+
+
+model Vote {
+  id        Int      @id @default(autoincrement())
+  date      DateTime
+  willEat   Boolean
+  choice    String?      // 👈 NEW: what item they chose
+  userId    Int
+
+  user      User     @relation(fields: [userId], references: [id])
+
+  @@unique([userId, date])
+}
+
+
+
+

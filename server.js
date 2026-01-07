@@ -1,17 +1,7 @@
 const express = require("express");
 const { PrismaClient } = require("@prisma/client");
-
-import express from "express";
-import bodyParser from "body-parser";
-import { PrismaClient } from "@prisma/client";
-
-let uuidv4;
-
-(async () => {
-  const uuid = await import("uuid");
-  uuidv4 = uuid.v4;
-})();
-
+const bodyParser = require("body-parser");
+const { v4: uuidv4 } = require("uuid");
 
 const app = express();
 const prisma = new PrismaClient();
@@ -396,6 +386,7 @@ const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
+
 
 
 

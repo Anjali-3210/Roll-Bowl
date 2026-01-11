@@ -12,6 +12,43 @@ app.use(express.urlencoded({ extended: true }));
 app.set("view engine", "ejs");
 
 app.get("/", (req, res) => {
+  res.render("index");
+});
+
+// Customer Login Route
+app.post("/customer-login", async (req, res) => {
+  const { name, phone } = req.body;
+
+  let user = await prisma.user.findFirst({
+    where: { phone }
+  });
+
+  if (!user) {
+    user = await prisma.user.create({
+      data: {
+        name,
+        phone,
+        token: uuidv4(), 
+      },
+    });
+  }
+  
+  res.redirect(`/customer?token=${user.token}`);
+});
+
+// Admin Login Route
+app.post("/admin-login", (req, res) => {
+  const { adminKey } = req.body;
+
+  if (adminKey === process.env.ADMIN_KEY) {
+    return res.redirect("/admin?key=" + adminKey);
+  }
+
+  res.send("Invalid Admin Key");
+});
+
+
+app.get("/", (req, res) => {
   res.send("Roll Bowl backend is running");
 });
 
@@ -386,6 +423,7 @@ const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
+
 
 
 

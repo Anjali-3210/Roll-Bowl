@@ -6,7 +6,8 @@
   "author": "Anjali",
   "main": "index.js",
   "scripts": {
-  "start": "npx prisma migrate deploy && node server.js"
+  "build": "npx prisma migrate deploy",
+  "start": "node server.js"
 },
   "dependencies": {
     "@prisma/client": "^6.19.1",

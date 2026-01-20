@@ -6,8 +6,8 @@
   "author": "Anjali",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
+  "start": "npx prisma migrate deploy && node server.js"
+};
   "dependencies": {
     "@prisma/client": "^6.19.1",
     "dotenv": "^17.2.3",

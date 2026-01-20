@@ -353,7 +353,7 @@ app.post("/vote-ui", async (req, res) => {
 app.get("/admin/kitchen-summary", async (req, res) => {
   const adminKey = req.query.key;
 
-  if (adminKey !== "rollbowl-admin-123") {
+  if (adminKey !== "ROLLBOWL123") {
     return res.status(403).send("Access denied");
   }
 
@@ -388,7 +388,7 @@ app.get("/admin/kitchen-summary", async (req, res) => {
 app.get("/admin/kitchen", async (req, res) => {
   const adminKey = req.query.key;
 
-  if (adminKey !== "rollbowl-admin-123") {
+  if (adminKey !== "ROLLBOWL123") {
     return res.status(403).send("Access denied");
   }
 
@@ -424,6 +424,7 @@ const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
+
 
 
 

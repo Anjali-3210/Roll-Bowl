@@ -83,10 +83,6 @@ app.post("/admin-login", (req, res) => {
 });
 
 
-app.get("/", (req, res) => {
-  res.send("Roll Bowl backend is running");
-});
-
 app.get("/users", async (req, res) => {
   const users = await prisma.user.findMany();
   res.json(users);
@@ -457,6 +453,7 @@ const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
+
 
 
 

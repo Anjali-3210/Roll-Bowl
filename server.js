@@ -18,37 +18,38 @@ app.get("/", (req, res) => {
 
 // Unified entry route
 app.post("/entry", async (req, res) => {
-  const { name, phone, adminKey } = req.body;
+  const { name, phone, adminKey, role } = req.body;
 
-  // Admin access
-  if (adminKey && adminKey === process.env.ADMIN_KEY) {
-    return res.redirect("/admin?key=" + adminKey);
-  }
-
-  // Kitchen access (optional, only if you already have KITCHEN_KEY)
-  if (adminKey && adminKey === process.env.KITCHEN_KEY) {
-    return res.redirect("/kitchen?key=" + adminKey);
-  }
-
-  // Default → Customer (find or create)
-let user = await prisma.user.findFirst({
-  where: { phone }
-});
-
-if (!user) {
-  user = await prisma.user.create({
-    data: {
-      name,
-      phone,
-      token: uuidv4()
+  if (role === "admin") {
+    if (adminKey === process.env.ADMIN_KEY) {
+      return res.redirect("/admin?key=" + adminKey);
     }
+
+    if (adminKey === process.env.KITCHEN_KEY) {
+      return res.redirect("/kitchen?key=" + adminKey);
+    }
+
+    return res.send("Invalid admin/kitchen key");
+  }
+
+  // Customer flow
+  let user = await prisma.user.findFirst({
+    where: { phone }
   });
-}
 
-return res.redirect(`/u/${user.token}`);
+  if (!user) {
+    user = await prisma.user.create({
+      data: {
+        name,
+        phone,
+        token: uuidv4()
+      }
+    });
+  }
 
-  
+  return res.redirect(`/u/${user.token}`);
 });
+
 
 
 // Customer Login Route
@@ -463,6 +464,7 @@ const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
+
 
 
 

@@ -342,6 +342,15 @@ app.get("/admin", async (req, res) => {
 
 
 app.post("/vote-ui", async (req, res) => {
+    // 10 PM cutoff check
+  const now = new Date();
+  const cutoff = new Date();
+  cutoff.setHours(22, 0, 0, 0); // 10:00 PM
+
+  if (now > cutoff) {
+    return res.send("Order for tomorrow is closed after 10 PM.");
+  }
+
   const { token, willEat, choice } = req.body;
 
   const user = await prisma.user.findUnique({
@@ -453,6 +462,7 @@ const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
+
 
 
 

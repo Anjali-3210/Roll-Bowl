@@ -2,63 +2,146 @@
 <html>
 <head>
     <title>Roll Bowl</title>
+<link href="https://fonts.googleapis.com/css2?family=League+Spartan:wght@600;700&family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  body {
+    margin: 0;
+    font-family: 'Poppins', sans-serif;
+    background-color: #ffffff;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+  }
+
+  .container {
+    width: 100%;
+    max-width: 380px;
+    padding: 24px;
+  }
+
+  h1 {
+    font-family: 'League Spartan', sans-serif;
+    color: #cc0e05;
+    text-align: center;
+    margin-bottom: 6px;
+  }
+
+  h2 {
+    font-size: 16px;
+    margin-top: 24px;
+    margin-bottom: 10px;
+    color: #268d24;
+  }
+
+  input {
+    width: 100%;
+    padding: 10px;
+    font-size: 14px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    margin-bottom: 12px;
+    font-family: 'Poppins', sans-serif;
+  }
+
+  input:focus {
+    outline: none;
+    border-color: #ffa629;
+  }
+
+  button {
+    width: 100%;
+    padding: 10px;
+    font-size: 14px;
+    font-family: 'Poppins', sans-serif;
+    font-weight: 600;
+    border-radius: 6px;
+    border: none;
+    cursor: pointer;
+  }
+
+  .btn-customer {
+    background-color: #cc0e05;
+    color: #ffffff;
+  }
+
+  .btn-admin {
+    background-color: #ffa629;
+    color: #000;
+    margin-top: 10px;
+  }
+
+  hr {
+    border: none;
+    height: 1px;
+    background-color: #eee;
+    margin: 24px 0;
+  }
+
+  .subtitle {
+    text-align: center;
+    font-size: 13px;
+    color: #555;
+    margin-bottom: 20px;
+  }
+</style>
+
 </head>
 <body>
-    <h1>Welcome to Roll Bowl</h1>
-<form method="POST" action="/entry">
+  <div class="container">
+    <h1>Roll Bowl</h1>
+    <p class="subtitle">Fresh meals. Simple choices.</p>
 
-  <h2>Customer Login</h2>
-  <input
-    type="text"
-    name="name"
-    placeholder="Enter your name"
-    required
-  />
-  <br><br>
+    <form method="POST" action="/entry">
 
-  <input
-    type="text"
-    name="phone"
-    placeholder="Enter phone number"
-    required
-  />
-  <br><br>
+      <h2>Customer Login</h2>
+      <input
+        type="text"
+        name="name"
+        placeholder="Your name"
+        required
+      />
 
-  <!-- Customer button -->
-  <button
-    type="submit"
-    name="role"
-    value="customer"
-    style="font-size:14px;padding:8px 14px;width:100%;"
-  >
-    Continue as Customer
-  </button>
+      <input
+        type="text"
+        name="phone"
+        placeholder="Phone number"
+        required
+      />
 
-  <hr style="margin:30px 0;" />
+      <button
+        type="submit"
+        name="role"
+        value="customer"
+        class="btn-customer"
+      >
+        Continue as Customer
+      </button>
 
-  <h2>Admin / Kitchen Login</h2>
-  <input
-    type="password"
-    name="adminKey"
-    placeholder="Enter admin / kitchen key"
-  />
-  <br><br>
+      <hr />
 
-  <!-- Admin button -->
-  <button
-    type="submit"
-    name="role"
-    value="admin"
-   style="font-size:14px;padding:8px 14px;width:100%;"
-  >
-    Continue as Admin / Kitchen
-  </button>
+      <h2>Admin / Kitchen</h2>
+      <input
+        type="password"
+        name="adminKey"
+        placeholder="Admin or Kitchen key"
+      />
 
-</form>
+      <button
+        type="submit"
+        name="role"
+        value="admin"
+        class="btn-admin"
+      >
+        Continue as Admin / Kitchen
+      </button>
 
-   
+    </form>
+  </div>
 </body>
+
 </html>
+
 
 
 

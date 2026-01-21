@@ -96,53 +96,61 @@
 
     <form method="POST" action="/entry">
 
-      <h2>Customer Login</h2>
-      <input
-        type="text"
-        name="name"
-        placeholder="Your name"
-        required
-      />
+  <h2>Customer Login</h2>
 
-      <input
-        type="text"
-        name="phone"
-        placeholder="Phone number"
-        required
-      />
+  <input
+    type="text"
+    name="name"
+    placeholder="Your name"
+    required
+  />
 
-      <button
-        type="submit"
-        name="role"
-        value="customer"
-        class="btn-customer"
-      >
-        Continue as Customer
-      </button>
+  <input
+    type="text"
+    name="phone"
+    placeholder="Phone number"
+    required
+  />
 
-      <hr />
+  <button
+    type="submit"
+    name="role"
+    value="customer"
+    class="btn-primary"
+  >
+    Continue as Customer
+  </button>
 
-      <h2>Admin / Kitchen</h2>
-      <input
-        type="password"
-        name="adminKey"
-        placeholder="Admin or Kitchen key"
-      />
+</form>
+<hr />
 
-      <button
-        type="submit"
-        name="role"
-        value="admin"
-        class="btn-admin"
-      >
-        Continue as Admin / Kitchen
-      </button>
+<form method="POST" action="/entry">
 
-    </form>
+  <h2>Admin / Kitchen</h2>
+
+  <input
+    type="password"
+    name="adminKey"
+    placeholder="Admin or Kitchen key"
+    required
+  />
+
+  <button
+    type="submit"
+    name="role"
+    value="admin"
+    class="btn-accent"
+  >
+    Continue as Admin / Kitchen
+  </button>
+
+</form>
+
   </div>
 </body>
 
 </html>
+
 
 
 

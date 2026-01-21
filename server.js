@@ -30,8 +30,23 @@ app.post("/entry", async (req, res) => {
     return res.redirect("/kitchen?key=" + adminKey);
   }
 
-  // Default → Customer
-  return res.redirect(`/customer?name=${encodeURIComponent(name)}&phone=${encodeURIComponent(phone)}`);
+  // Default → Customer (find or create)
+let user = await prisma.user.findFirst({
+  where: { phone }
+});
+
+if (!user) {
+  user = await prisma.user.create({
+    data: {
+      name,
+      phone,
+      token: uuidv4()
+    }
+  });
+}
+
+return res.redirect(`/customer?token=${user.token}`);
+  
 });
 
 
@@ -443,6 +458,7 @@ const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
+
 
 
 

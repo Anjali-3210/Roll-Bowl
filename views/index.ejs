@@ -5,22 +5,59 @@
 </head>
 <body>
     <h1>Welcome to Roll Bowl</h1>
+<form method="POST" action="/entry">
 
-    <form action="/entry" method="POST">
-        <h2>Customer</h2>
-        <input type="text" name="name" placeholder="Enter your name" required>
-        <br><br>
-        <input type="text" name="phone" placeholder="Enter phone number" required>
-        <br><br>
+  <h2>Customer Login</h2>
+  <input
+    type="text"
+    name="name"
+    placeholder="Enter your name"
+    required
+  />
+  <br><br>
 
-        <hr>
+  <input
+    type="text"
+    name="phone"
+    placeholder="Enter phone number"
+    required
+  />
+  <br><br>
 
-        <h2>Admin / Kitchen</h2>
-        <input type="password" name="adminKey" placeholder="Enter key (optional)">
-        <br><br>
+  <!-- Customer button -->
+  <button
+    type="submit"
+    name="role"
+    value="customer"
+    style="font-size:18px;padding:10px 20px;width:100%;"
+  >
+    Continue as Customer
+  </button>
 
-        <button type="submit">Continue</button>
-    </form>
+  <hr style="margin:30px 0;" />
+
+  <h2>Admin / Kitchen Login</h2>
+  <input
+    type="password"
+    name="adminKey"
+    placeholder="Enter admin / kitchen key"
+  />
+  <br><br>
+
+  <!-- Admin button -->
+  <button
+    type="submit"
+    name="role"
+    value="admin"
+    style="font-size:18px;padding:10px 20px;width:100%;"
+  >
+    Continue as Admin / Kitchen
+  </button>
+
+</form>
+
+   
 </body>
 </html>
+
 

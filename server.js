@@ -387,7 +387,7 @@ app.post("/vote-ui", async (req, res) => {
     },
   });
 
-  res.send("Your response has been recorded. Thank you!");
+  res.render("vote-success");
 });
 
 
@@ -465,6 +465,7 @@ const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
+
 
 
 

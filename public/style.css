@@ -17,6 +17,14 @@ body {
   padding: 24px;
 }
 
+.logo {
+  display: block;
+  margin: 0 auto 16px auto;
+  max-width: 140px;
+  height: auto;
+}
+
+
 h1 {
   font-family: 'League Spartan', sans-serif;
   color: #cc0e05;
@@ -104,3 +112,4 @@ hr {
   font-weight: 600;
   margin-top: 20px;
 }
+

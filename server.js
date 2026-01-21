@@ -16,6 +16,25 @@ app.get("/", (req, res) => {
   res.render("index");
 });
 
+// Unified entry route
+app.post("/entry", async (req, res) => {
+  const { name, phone, adminKey } = req.body;
+
+  // Admin access
+  if (adminKey && adminKey === process.env.ADMIN_KEY) {
+    return res.redirect("/admin?key=" + adminKey);
+  }
+
+  // Kitchen access (optional, only if you already have KITCHEN_KEY)
+  if (adminKey && adminKey === process.env.KITCHEN_KEY) {
+    return res.redirect("/kitchen?key=" + adminKey);
+  }
+
+  // Default → Customer
+  return res.redirect(`/customer?name=${encodeURIComponent(name)}&phone=${encodeURIComponent(phone)}`);
+});
+
+
 // Customer Login Route
 app.post("/customer-login", async (req, res) => {
   const { name, phone } = req.body;
@@ -424,6 +443,7 @@ const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
+
 
 
 

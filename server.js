@@ -45,7 +45,8 @@ if (!user) {
   });
 }
 
-return res.redirect(`/customer?token=${user.token}`);
+return res.redirect(`/u/${user.token}`);
+
   
 });
 
@@ -462,6 +463,7 @@ const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
+
 
 
 

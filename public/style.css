@@ -19,8 +19,8 @@ body {
 
 .logo {
   display: block;
-  margin: 0 auto 12px auto;
-  max-width: 80px;
+  margin: 0 auto 20px auto;
+  max-width: 140px;
   height: auto;
 }
 
@@ -112,5 +112,6 @@ hr {
   font-weight: 600;
   margin-top: 20px;
 }
+
 
 

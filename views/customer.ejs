@@ -4,52 +4,81 @@
     <title>Roll Bowl</title>
     <link rel="stylesheet" href="/style.css">
   </head>
+
   <body>
     <div class="container">
-    <img src="/rollbowllogo.png" alt="Roll Bowl Logo" class="logo" />
-    <h1>Hello <%= name %></h1>
-    <div style="margin-bottom: 20px;">
-  <% if (remainingDays > 0) { %>
-    <p>
-      <strong>Subscription active</strong><br />
-      Days remaining: <%= remainingDays %>
-    </p>
-  <% } else { %>
-    <p style="color: red;">
-      <strong>Subscription expired</strong>
-    </p>
-  <% } %>
-</div>
 
+      <!-- LOGO -->
+      <img src="/rollbowllogo.png" alt="Roll Bowl Logo" class="logo" />
+      <p class="subtitle">Healthy Choice, Zero Compromise</p>
 
-    <% if (todayMenu) { %>
-      <h2>Today's Menu</h2>
-      <form method="POST" action="/vote-ui">
-        <input type="hidden" name="token" value="<%= token %>" />
+      <!-- SUBSCRIPTION DASHBOARD -->
+      <div class="card">
+        <p><strong>Plan:</strong> <%= subscription.planType %></p>
+        <p><strong>Start Date:</strong> <%= subscription.startDate.toDateString() %></p>
+        <p><strong>Valid Till:</strong> <%= subscription.endDate.toDateString() %></p>
+        <p>
+          <strong>Meals Used:</strong>
+          <%= subscription.mealsConsumed %> / <%= subscription.totalMeals %>
+        </p>
+        <p>
+          <strong>Meals Remaining:</strong>
+          <%= subscription.totalMeals - subscription.mealsConsumed %>
+        </p>
+      </div>
 
-        <% todayMenu.items.split(',').forEach(item => { %>
-          <div>
-            <input type="radio" name="choice" value="<%= item.trim() %>" required />
-            <label><%= item.trim() %></label>
-          </div>
-        <% }) %>
+      <!-- GREETING -->
+      <h1>Hello <%= name %></h1>
 
-        <br />
+      <!-- MENU + VOTING -->
+      <% if (todayMenu) { %>
+        <h2>Today's Menu</h2>
 
-        <button type="submit" name="willEat" value="true">
-          I will eat tomorrow
-        </button>
+        <form method="POST" action="/vote-ui">
+          <input type="hidden" name="token" value="<%= token %>" />
 
-        <button type="submit" name="willEat" value="false">
-          I will skip tomorrow
-        </button>
-      </form>
-    <% } else { %>
-      <p>No menu available for today.</p>
-    <% } %>
-</div>
+          <% todayMenu.items.split(',').forEach(item => { %>
+            <div>
+              <input
+                type="radio"
+                name="choice"
+                value="<%= item.trim() %>"
+                required
+              />
+              <label><%= item.trim() %></label>
+            </div>
+          <% }) %>
+
+          <br />
+
+          <button
+            type="submit"
+            name="willEat"
+            value="true"
+            class="btn-success"
+          >
+            I will eat tomorrow
+          </button>
+
+          <button
+            type="submit"
+            name="willEat"
+            value="false"
+            class="btn-accent"
+          >
+            I will skip tomorrow
+          </button>
+        </form>
+
+      <% } else { %>
+        <p>No menu available for today.</p>
+      <% } %>
+
+    </div>
   </body>
 </html>
+
+
 
 
 

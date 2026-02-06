@@ -19,7 +19,7 @@ body {
 
 .logo {
   display: block;
-  margin: 0 auto 6px auto;
+  margin: 0 auto 10px auto;
   max-width: 190px;
   height: auto;
 }
@@ -126,8 +126,8 @@ hr {
   }
 
   .logo {
-    max-width: 170px;
-    margin-bottom: 8px;
+    max-width: 200px;
+    margin-bottom: 14px;
   }
 
   h1 {
@@ -164,6 +164,7 @@ input[type="checkbox"] {
   transform: scale(1.2);
   margin-right: 8px;
 }
+
 
 
 

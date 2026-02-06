@@ -54,6 +54,14 @@ model Vote {
   @@unique([userId, date])
 }
 
+model Holiday {
+  id        Int      @id @default(autoincrement())
+  date      DateTime @unique
+  reason    String?
+  createdAt DateTime @default(now())
+}
+
+
 
 
 

@@ -1,3 +1,9 @@
+enum PlanType {
+  BASIC
+  PREMIUM
+}
+
+
 generator client {
   provider = "prisma-client-js"
 }
@@ -22,6 +28,11 @@ model Subscription {
   endDate   DateTime
   userId    Int      @unique
   user      User     @relation(fields: [userId], references: [id])
+  totalMeals     Int      @default(20)
+  mealsConsumed  Int      @default(0)
+  planType       PlanType
+
+  createdAt      DateTime @default(now()) 
 }
 
 model Menu {

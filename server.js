@@ -409,6 +409,19 @@ app.post("/vote-ui", async (req, res) => {
   if (isWeekend(tomorrow) || await isHoliday(tomorrow)) {
   return res.send("Voting is disabled due to holiday / weekend.");
 }
+  const subscription = await prisma.subscription.findFirst({
+  where: {
+    userId: user.id,
+    endDate: {
+      gte: new Date()
+    }
+  }
+});
+
+if (!subscription) {
+  return res.send("No active subscription.");
+}
+
 
   await prisma.vote.upsert({
     where: {
@@ -427,6 +440,22 @@ app.post("/vote-ui", async (req, res) => {
       willEat: willEat === "true",
       choice,
     },
+
+    if (subscription.mealsConsumed >= subscription.totalMeals) {
+  return res.send("Your meal quota is exhausted.");
+}
+    
+    if (willEat === "true") {
+  await prisma.subscription.update({
+    where: { id: subscription.id },
+    data: {
+      mealsConsumed: {
+        increment: 1
+      }
+    }
+  });
+}
+
   });
 
   res.render("vote-success");
@@ -507,6 +536,7 @@ const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
+
 
 
 

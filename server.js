@@ -7,6 +7,31 @@ const app = express();
 const prisma = new PrismaClient();
 app.use(express.static("public"));
 
+async function isHoliday(date) {
+  const start = new Date(date);
+  start.setHours(0, 0, 0, 0);
+
+  const end = new Date(start);
+  end.setHours(23, 59, 59, 999);
+
+  const holiday = await prisma.holiday.findFirst({
+    where: {
+      date: {
+        gte: start,
+        lte: end
+      }
+    }
+  });
+
+  return !!holiday;
+}
+
+function isWeekend(date) {
+  const day = date.getDay();
+  return day === 0 || day === 6; // Sunday or Saturday
+}
+
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
@@ -343,6 +368,19 @@ app.get("/admin", async (req, res) => {
   });
 });
 
+app.post("/admin/holiday", async (req, res) => {
+  const { date, reason } = req.body;
+
+  const holiday = await prisma.holiday.create({
+    data: {
+      date: new Date(date),
+      reason
+    }
+  });
+
+  res.json(holiday);
+});
+
 
 app.post("/vote-ui", async (req, res) => {
     // 10 PM cutoff check
@@ -363,6 +401,15 @@ app.post("/vote-ui", async (req, res) => {
   if (!user) {
     return res.status(404).send("Invalid user");
   }
+
+  const tomorrow = new Date();
+tomorrow.setDate(tomorrow.getDate() + 1);
+tomorrow.setHours(0, 0, 0, 0);
+
+if (isWeekend(tomorrow) || await isHoliday(tomorrow)) {
+  return res.send("Voting is disabled due to holiday / weekend.");
+}
+
 
   const tomorrow = new Date();
   tomorrow.setDate(tomorrow.getDate() + 1);
@@ -465,6 +512,7 @@ const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
+
 
 
 

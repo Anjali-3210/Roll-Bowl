@@ -207,20 +207,21 @@ app.post("/menu", async (req, res) => {
   const { date, items } = req.body;
 
   const menu = await prisma.menu.upsert({
-    where: {
-      date: new Date(date),
-    },
+    where: { date: new Date(date) },
     update: {
       items,
+      isWeekly: false, // override
     },
     create: {
       date: new Date(date),
       items,
+      isWeekly: false,
     },
   });
 
   res.json(menu);
 });
+
 
 
 app.get("/menu/today", async (req, res) => {
@@ -390,6 +391,37 @@ app.post("/admin/holiday", async (req, res) => {
 });
 
 
+app.post("/admin/menu-week", async (req, res) => {
+  const { startDate, items } = req.body;
+
+  const start = new Date(startDate); // Sunday
+  start.setHours(0, 0, 0, 0);
+
+  for (let i = 0; i < 7; i++) {
+    const date = new Date(start);
+    date.setDate(start.getDate() + i);
+
+    // Skip weekends automatically
+    if (date.getDay() === 0 || date.getDay() === 6) continue;
+
+    await prisma.menu.upsert({
+      where: { date },
+      update: {
+        items,
+        isWeekly: true,
+      },
+      create: {
+        date,
+        items,
+        isWeekly: true,
+      },
+    });
+  }
+
+  res.send("Weekly menu uploaded successfully");
+});
+
+
 app.post("/vote-ui", async (req, res) => {
 
   // ⏰ 10:30 PM cutoff check
@@ -552,6 +584,7 @@ const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
+
 
 
 

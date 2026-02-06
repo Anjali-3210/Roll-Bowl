@@ -128,18 +128,26 @@ app.post("/users", async (req, res) => {
 });
 
 app.post("/subscribe", async (req, res) => {
-  const { userId, startDate, endDate } = req.body;
+  const { userId, startDate, planType } = req.body;
+
+  const start = new Date(startDate);
+  const end = new Date(start);
+  end.setDate(end.getDate() + 25); // 25-day validity
 
   const subscription = await prisma.subscription.create({
     data: {
-      startDate: new Date(startDate),
-      endDate: new Date(endDate),
-      userId: userId,
+      userId,
+      startDate: start,
+      endDate: end,
+      totalMeals: 20,
+      mealsConsumed: 0,
+      planType, // BASIC or PREMIUM
     },
   });
 
   res.json(subscription);
 });
+
 
 
 app.get("/u/:token", async (req, res) => {
@@ -189,7 +197,7 @@ if (user.subscription) {
     name: user.name,
     token: user.token,
     todayMenu: menu,
-    remainingDays,
+    subscription,
   });
 });
 
@@ -544,6 +552,7 @@ const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
+
 
 
 

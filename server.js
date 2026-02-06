@@ -383,10 +383,11 @@ app.post("/admin/holiday", async (req, res) => {
 
 
 app.post("/vote-ui", async (req, res) => {
-    // 10 PM cutoff check
+
+  // ⏰ 10:30 PM cutoff check
   const now = new Date();
   const cutoff = new Date();
-  cutoff.setHours(22, 30, 0, 0); // 10:00 PM
+  cutoff.setHours(22, 30, 0, 0); // 10:30 PM
 
   if (now > cutoff) {
     return res.send("Order for tomorrow is closed after 10:30 PM.");
@@ -402,27 +403,36 @@ app.post("/vote-ui", async (req, res) => {
     return res.status(404).send("Invalid user");
   }
 
+  // 📅 Tomorrow date
   const tomorrow = new Date();
   tomorrow.setDate(tomorrow.getDate() + 1);
   tomorrow.setHours(0, 0, 0, 0);
 
+  // 🚫 Holiday / weekend check
   if (isWeekend(tomorrow) || await isHoliday(tomorrow)) {
-  return res.send("Voting is disabled due to holiday / weekend.");
-}
-  const subscription = await prisma.subscription.findFirst({
-  where: {
-    userId: user.id,
-    endDate: {
-      gte: new Date()
-    }
+    return res.send("Voting is disabled due to holiday / weekend.");
   }
-});
 
-if (!subscription) {
-  return res.send("No active subscription.");
-}
+  // 📦 Active subscription check
+  const subscription = await prisma.subscription.findFirst({
+    where: {
+      userId: user.id,
+      endDate: {
+        gte: new Date(),
+      },
+    },
+  });
 
+  if (!subscription) {
+    return res.send("No active subscription.");
+  }
 
+  // 🍽️ Meal quota check
+  if (subscription.mealsConsumed >= subscription.totalMeals) {
+    return res.send("Your meal quota is exhausted.");
+  }
+
+  // 🗳️ Save / update vote
   await prisma.vote.upsert({
     where: {
       userId_date: {
@@ -440,26 +450,24 @@ if (!subscription) {
       willEat: willEat === "true",
       choice,
     },
-
-    if (subscription.mealsConsumed >= subscription.totalMeals) {
-  return res.send("Your meal quota is exhausted.");
-}
-    
-    if (willEat === "true") {
-  await prisma.subscription.update({
-    where: { id: subscription.id },
-    data: {
-      mealsConsumed: {
-        increment: 1
-      }
-    }
-  });
-}
-
   });
 
+  // ➕ Increment meals ONLY if eating
+  if (willEat === "true") {
+    await prisma.subscription.update({
+      where: { id: subscription.id },
+      data: {
+        mealsConsumed: {
+          increment: 1,
+        },
+      },
+    });
+  }
+
+  // ✅ Success screen
   res.render("vote-success");
 });
+
 
 
 app.get("/admin/kitchen-summary", async (req, res) => {
@@ -536,6 +544,7 @@ const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
+
 
 
 

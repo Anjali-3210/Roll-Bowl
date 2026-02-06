@@ -435,6 +435,7 @@ app.post("/vote-ui", async (req, res) => {
 
   const { token, willEat, choice } = req.body;
 
+  // 👤 User check
   const user = await prisma.user.findUnique({
     where: { token },
   });
@@ -472,6 +473,42 @@ app.post("/vote-ui", async (req, res) => {
     return res.send("Your meal quota is exhausted.");
   }
 
+  // 🧠 Normalize selected choices
+  let selectedChoices = [];
+
+  if (Array.isArray(choice)) {
+    selectedChoices = choice;
+  } else if (choice) {
+    selectedChoices = [choice];
+  }
+
+  // 🔒 Plan-based validation
+  if (subscription.planType === "BASIC") {
+    if (selectedChoices.length !== 1) {
+      return res.send("Basic plan allows only one item.");
+    }
+  }
+
+  if (subscription.planType === "PREMIUM") {
+    if (selectedChoices.length !== 2) {
+      return res.send("Premium plan allows exactly two items.");
+    }
+
+    const hasRoll = selectedChoices.some(c =>
+      c.toLowerCase().includes("roll")
+    );
+
+    const hasBowl = selectedChoices.some(
+      c =>
+        c.toLowerCase().includes("rice") ||
+        c.toLowerCase().includes("bowl")
+    );
+
+    if (!hasRoll || !hasBowl) {
+      return res.send("Premium plan requires one roll and one bowl.");
+    }
+  }
+
   // 🗳️ Save / update vote
   await prisma.vote.upsert({
     where: {
@@ -482,13 +519,13 @@ app.post("/vote-ui", async (req, res) => {
     },
     update: {
       willEat: willEat === "true",
-      choice,
+      choice: selectedChoices.join(", "),
     },
     create: {
       userId: user.id,
       date: tomorrow,
       willEat: willEat === "true",
-      choice,
+      choice: selectedChoices.join(", "),
     },
   });
 
@@ -584,6 +621,7 @@ const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
+
 
 
 

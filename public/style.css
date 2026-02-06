@@ -117,6 +117,56 @@ hr {
   margin-top: 20px;
 }
 
+/* 📱 MOBILE RESPONSIVENESS */
+@media (max-width: 480px) {
+
+  .container {
+    max-width: 100%;
+    padding: 16px;
+  }
+
+  .logo {
+    max-width: 120px;
+    margin-bottom: 8px;
+  }
+
+  h1 {
+    font-size: 22px;
+  }
+
+  h2 {
+    font-size: 15px;
+  }
+
+  .subtitle {
+    font-size: 13px;
+    margin-bottom: 20px;
+  }
+
+  input {
+    font-size: 15px;
+    padding: 12px;
+  }
+
+  button {
+    font-size: 15px;
+    padding: 12px;
+  }
+
+  .card {
+    padding: 14px;
+  }
+
+}
+
+input[type="radio"],
+input[type="checkbox"] {
+  transform: scale(1.2);
+  margin-right: 8px;
+}
+
+
+
 
 
 

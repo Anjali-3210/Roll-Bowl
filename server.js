@@ -403,8 +403,8 @@ app.post("/vote-ui", async (req, res) => {
   }
 
   const tomorrow = new Date();
-tomorrow.setDate(tomorrow.getDate() + 1);
-tomorrow.setHours(0, 0, 0, 0);
+  tomorrow.setDate(tomorrow.getDate() + 1);
+  tomorrow.setHours(0, 0, 0, 0);
 
 if (isWeekend(tomorrow) || await isHoliday(tomorrow)) {
   return res.send("Voting is disabled due to holiday / weekend.");
@@ -512,6 +512,7 @@ const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
+
 
 
 

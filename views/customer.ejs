@@ -32,51 +32,63 @@
 
       <!-- MENU + VOTING -->
       <% if (todayMenu) { %>
-        <h2>Today's Menu</h2>
+       <h2>Today's Menu</h2>
 
-        <form method="POST" action="/vote-ui">
-          <input type="hidden" name="token" value="<%= token %>" />
+<form method="POST" action="/vote-ui">
+  <input type="hidden" name="token" value="<%= token %>" />
 
-          <% todayMenu.items.split(',').forEach(item => { %>
-            <div>
-              <input
-                type="radio"
-                name="choice"
-                value="<%= item.trim() %>"
-                required
-              />
-              <label><%= item.trim() %></label>
-            </div>
-          <% }) %>
+  <% 
+    const items = todayMenu.items.split(',').map(i => i.trim());
+    const isPremium = subscription.planType === "PREMIUM";
+  %>
 
-          <br />
+  <% if (!isPremium) { %>
+    <!-- BASIC PLAN: ONE ITEM ONLY -->
+    <% items.forEach(item => { %>
+      <div>
+        <input
+          type="radio"
+          name="choice"
+          value="<%= item %>"
+          required
+        />
+        <label><%= item %></label>
+      </div>
+    <% }) %>
 
-          <button
-            type="submit"
-            name="willEat"
-            value="true"
-            class="btn-success"
-          >
-            I will eat tomorrow
-          </button>
+  <% } else { %>
+    <!-- PREMIUM PLAN: TWO ITEMS -->
+    <% items.forEach(item => { %>
+      <div>
+        <input
+          type="checkbox"
+          name="choice"
+          value="<%= item %>"
+        />
+        <label><%= item %></label>
+      </div>
+    <% }) %>
 
-          <button
-            type="submit"
-            name="willEat"
-            value="false"
-            class="btn-accent"
-          >
-            I will skip tomorrow
-          </button>
-        </form>
+    <p style="font-size:12px;color:#666;">
+      * Premium plan allows 2 items (1 roll + 1 bowl)
+    </p>
+  <% } %>
 
-      <% } else { %>
-        <p>No menu available for today.</p>
-      <% } %>
+  <br />
+
+  <button type="submit" name="willEat" value="true" class="btn-success">
+    I will eat tomorrow
+  </button>
+
+  <button type="submit" name="willEat" value="false" class="btn-accent">
+    I will skip tomorrow
+  </button>
+</form>
 
     </div>
   </body>
 </html>
+
 
 
 

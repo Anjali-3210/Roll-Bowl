@@ -39,7 +39,6 @@ model Menu {
   id    Int      @id @default(autoincrement())
   date  DateTime @unique
   items String
-  isWeekly  Boolean  @default(false)
   createdAt DateTime @default(now())
 }
 

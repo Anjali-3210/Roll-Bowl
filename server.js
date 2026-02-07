@@ -392,53 +392,58 @@ app.post("/admin/holiday", async (req, res) => {
 
 
 app.post("/admin/menu-week", async (req, res) => {
-  const { weekStartDate, menu } = req.body;
+  try {
+    const { weekStartDate, menu } = req.body;
 
-  if (!weekStartDate || !menu) {
-    return res.status(400).send("weekStartDate and menu are required");
+    if (!weekStartDate || !menu) {
+      return res.status(400).send("weekStartDate and menu are required");
+    }
+
+    const sunday = new Date(weekStartDate);
+    sunday.setHours(0, 0, 0, 0);
+
+    if (sunday.getDay() !== 0) {
+      return res.status(400).send("weekStartDate must be a Sunday");
+    }
+
+    const dayOffsetMap = {
+      monday: 1,
+      tuesday: 2,
+      wednesday: 3,
+      thursday: 4,
+      friday: 5
+    };
+
+    for (const day of Object.keys(dayOffsetMap)) {
+      if (!menu[day]) continue;
+
+      const date = new Date(sunday);
+      date.setDate(sunday.getDate() + dayOffsetMap[day]);
+      date.setHours(0, 0, 0, 0); // 🔴 CRITICAL LINE
+
+      // Delete existing menu for safety (prevents Prisma crash)
+      await prisma.menu.deleteMany({
+        where: { date }
+      });
+
+      // Create fresh entry
+      await prisma.menu.create({
+        data: {
+          date,
+          items: menu[day],
+          isWeekly: true
+        }
+      });
+    }
+
+    res.send("Weekly day-wise menu uploaded successfully");
+
+  } catch (err) {
+    console.error("WEEKLY MENU ERROR:", err);
+    res.status(500).send("Internal Server Error: " + err.message);
   }
-
-  // weekStartDate must be Sunday
-  const sunday = new Date(weekStartDate);
-  sunday.setHours(0, 0, 0, 0);
-
-  if (sunday.getDay() !== 0) {
-    return res.status(400).send("weekStartDate must be a Sunday");
-  }
-
-  // Map days to offsets from Sunday
-  const dayOffsetMap = {
-    monday: 1,
-    tuesday: 2,
-    wednesday: 3,
-    thursday: 4,
-    friday: 5
-  };
-
-  for (const day in menu) {
-    if (!dayOffsetMap[day]) continue;
-
-    const date = new Date(sunday);
-    date.setDate(sunday.getDate() + dayOffsetMap[day]);
-
-    await prisma.menu.upsert({
-      where: {
-        date: date
-      },
-      update: {
-        items: menu[day],
-        isWeekly: true
-      },
-      create: {
-        date: date,
-        items: menu[day],
-        isWeekly: true
-      }
-    });
-  }
-
-  res.send("Weekly day-wise menu uploaded successfully");
 });
+
 
 
 

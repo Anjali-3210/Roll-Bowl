@@ -210,12 +210,10 @@ app.post("/menu", async (req, res) => {
     where: { date: new Date(date) },
     update: {
       items,
-      isWeekly: false, // override
     },
     create: {
       date: new Date(date),
       items,
-      isWeekly: false,
     },
   });
 
@@ -431,7 +429,6 @@ app.post("/admin/menu-week", async (req, res) => {
         data: {
           date,
           items: menu[day],
-          isWeekly: true
         }
       });
     }
@@ -646,6 +643,7 @@ const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
+
 
 
 

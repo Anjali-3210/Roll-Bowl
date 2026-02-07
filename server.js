@@ -392,34 +392,54 @@ app.post("/admin/holiday", async (req, res) => {
 
 
 app.post("/admin/menu-week", async (req, res) => {
-  const { startDate, items } = req.body;
+  const { weekStartDate, menu } = req.body;
 
-  const start = new Date(startDate); // Sunday
-  start.setHours(0, 0, 0, 0);
+  if (!weekStartDate || !menu) {
+    return res.status(400).send("weekStartDate and menu are required");
+  }
 
-  for (let i = 0; i < 7; i++) {
-    const date = new Date(start);
-    date.setDate(start.getDate() + i);
+  // weekStartDate must be Sunday
+  const sunday = new Date(weekStartDate);
+  sunday.setHours(0, 0, 0, 0);
 
-    // Skip weekends automatically
-    if (date.getDay() === 0 || date.getDay() === 6) continue;
+  if (sunday.getDay() !== 0) {
+    return res.status(400).send("weekStartDate must be a Sunday");
+  }
+
+  // Map days to offsets from Sunday
+  const dayOffsetMap = {
+    monday: 1,
+    tuesday: 2,
+    wednesday: 3,
+    thursday: 4,
+    friday: 5
+  };
+
+  for (const day in menu) {
+    if (!dayOffsetMap[day]) continue;
+
+    const date = new Date(sunday);
+    date.setDate(sunday.getDate() + dayOffsetMap[day]);
 
     await prisma.menu.upsert({
-      where: { date },
+      where: {
+        date: date
+      },
       update: {
-        items,
-        isWeekly: true,
+        items: menu[day],
+        isWeekly: true
       },
       create: {
-        date,
-        items,
-        isWeekly: true,
-      },
+        date: date,
+        items: menu[day],
+        isWeekly: true
+      }
     });
   }
 
-  res.send("Weekly menu uploaded successfully");
+  res.send("Weekly day-wise menu uploaded successfully");
 });
+
 
 
 app.post("/vote-ui", async (req, res) => {
@@ -621,6 +641,7 @@ const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
+
 
 
 

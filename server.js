@@ -129,10 +129,10 @@ app.post("/users", async (req, res) => {
 
 app.post("/subscribe", async (req, res) => {
   try {
-    const { userId, startDate, planType } = req.body;
+    const { userId, startDate } = req.body;
 
-    if (!userId || !startDate || !planType) {
-      return res.status(400).send("userId, startDate and planType are required");
+    if (!userId || !startDate) {
+      return res.status(400).send("userId and startDate are required");
     }
 
     const user = await prisma.user.findUnique({
@@ -153,8 +153,7 @@ app.post("/subscribe", async (req, res) => {
       data: {
         userId: user.id,
         startDate: start,
-        endDate: end,
-        planType: planType.toUpperCase()
+        endDate: end
       }
     });
 
@@ -165,6 +164,7 @@ app.post("/subscribe", async (req, res) => {
     res.status(500).send("Internal Server Error: " + err.message);
   }
 });
+
 
 app.get("/u/:token", async (req, res) => {
   const { token } = req.params;
@@ -521,32 +521,14 @@ if (usedMeals >= 20) {
     selectedChoices = [choice];
   }
 
-  // 🔒 Plan-based validation
-  if (subscription.planType === "BASIC") {
-    if (selectedChoices.length !== 1) {
-      return res.send("Basic plan allows only one item.");
-    }
-  }
+// 🔒 Basic validation (temporary – DB compatible)
+if (!selectedChoices || selectedChoices.length === 0) {
+  return res.send("Please select at least one item.");
+}
 
-  if (subscription.planType === "PREMIUM") {
-    if (selectedChoices.length !== 2) {
-      return res.send("Premium plan allows exactly two items.");
-    }
-
-    const hasRoll = selectedChoices.some(c =>
-      c.toLowerCase().includes("roll")
-    );
-
-    const hasBowl = selectedChoices.some(
-      c =>
-        c.toLowerCase().includes("rice") ||
-        c.toLowerCase().includes("bowl")
-    );
-
-    if (!hasRoll || !hasBowl) {
-      return res.send("Premium plan requires one roll and one bowl.");
-    }
-  }
+if (selectedChoices.length > 2) {
+  return res.send("You can select maximum two items.");
+}
 
   // 🗳️ Save / update vote
   await prisma.vote.upsert({
@@ -648,6 +630,7 @@ const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
+
 
 
 

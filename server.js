@@ -154,52 +154,45 @@ app.get("/u/:token", async (req, res) => {
   const { token } = req.params;
 
   const user = await prisma.user.findUnique({
-    where: { token },
-    include: {
-      subscription: true,
-      votes: true,
-    },
+    where: { token }
   });
 
   if (!user) {
     return res.status(404).send("Invalid or expired link");
   }
 
+  // 🔹 Fetch active subscription
+  const subscription = await prisma.subscription.findFirst({
+    where: {
+      userId: user.id,
+      endDate: {
+        gte: new Date()
+      }
+    }
+  });
+
+  if (!subscription) {
+    return res.send("No active subscription found.");
+  }
+
+  // 🔹 Get today's menu
   const today = new Date();
   today.setHours(0, 0, 0, 0);
 
   const menu = await prisma.menu.findFirst({
-  where: {
-    date: {
-      gte: today,
-      lte: new Date(today.getTime() + 24 * 60 * 60 * 1000),
-    },
-  },
+    where: {
+      date: today
+    }
   });
-
-  let remainingDays = 0;
-
-if (user.subscription) {
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-
-  const end = new Date(user.subscription.endDate);
-  end.setHours(0, 0, 0, 0);
-
-  remainingDays = Math.ceil(
-    (end - today) / (1000 * 60 * 60 * 24)
-  );
-}
-
-
 
   res.render("customer", {
     name: user.name,
     token: user.token,
     todayMenu: menu,
-    subscription,
+    subscription
   });
 });
+
 
 
 
@@ -643,6 +636,7 @@ const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
+
 
 
 

@@ -15,37 +15,12 @@
     <!-- Greeting -->
     <h1 class="greeting">Hello <%= name %></h1>
 
-    <!-- Subscription Info -->
-    <% if (subscription) { %>
-      <div class="card">
-        <p>
-          <strong>Subscription Start:</strong>
-          <%= new Date(subscription.startDate).toDateString() %>
-        </p>
-        <p>
-          <strong>Valid Till:</strong>
-          <%= new Date(subscription.endDate).toDateString() %>
-        </p>
-        <p><strong>Meal Limit:</strong> 20 meals</p>
-      </div>
-    <% } else { %>
-      <div class="card" style="color:red;">
-        No active subscription
-      </div>
-    <% } %>
-
-    <!-- Divider -->
-    <hr />
 
     <!-- Menu + Voting -->
     <% if (todayMenu) { %>
 
       <h2>
-        Voting for
-        <br />
-        <span style="color:#268d24;">
-          Tomorrow
-        </span>
+        Voting for Tomorrow
       </h2>
 
       <p style="font-size:13px;color:#666;">
@@ -72,11 +47,11 @@
         <br />
 
         <button class="btn-success" type="submit" name="willEat" value="true">
-          I will eat tomorrow
+          I will eat tomorrow😃
         </button>
 
         <button class="btn-accent" type="submit" name="willEat" value="false">
-          I will skip tomorrow
+          I will skip tomorrow😓
         </button>
       </form>
 
@@ -86,9 +61,33 @@
 
     <% } %>
 
+    <!-- Divider -->
+    <hr />
+
+<!-- Subscription Info -->
+    <% if (subscription) { %>
+      <div class="card">
+        <p>
+          <strong>Subscription Start:</strong>
+          <%= new Date(subscription.startDate).toDateString() %>
+        </p>
+        <p>
+          <strong>Valid Till:</strong>
+          <%= new Date(subscription.endDate).toDateString() %>
+        </p>
+        <p><strong>Meal Limit:</strong> 20 meals</p>
+      </div>
+    <% } else { %>
+      <div class="card" style="color:red;">
+        No active subscription
+      </div>
+    <% } %>
+
+
   </div>
 </body>
 </html>
+
 
 
 

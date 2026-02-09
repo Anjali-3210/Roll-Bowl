@@ -30,8 +30,7 @@ model Subscription {
   user      User     @relation(fields: [userId], references: [id])
   totalMeals     Int      @default(20)
   mealsConsumed  Int      @default(0)
-  planType       PlanType
-
+  planType       string
   createdAt      DateTime @default(now()) 
 }
 

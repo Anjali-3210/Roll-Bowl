@@ -135,7 +135,6 @@ app.post("/subscribe", async (req, res) => {
       return res.status(400).send("userId, startDate and planType are required");
     }
 
-    // Check user exists
     const user = await prisma.user.findUnique({
       where: { id: Number(userId) }
     });
@@ -155,8 +154,6 @@ app.post("/subscribe", async (req, res) => {
         userId: user.id,
         startDate: start,
         endDate: end,
-        totalMeals: 20,
-        mealsConsumed: 0,
         planType: planType.toUpperCase()
       }
     });
@@ -168,6 +165,7 @@ app.post("/subscribe", async (req, res) => {
     res.status(500).send("Internal Server Error: " + err.message);
   }
 });
+
 
 
 
@@ -658,6 +656,7 @@ const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
+
 
 
 

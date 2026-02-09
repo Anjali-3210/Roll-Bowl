@@ -523,87 +523,99 @@ app.post("/admin/menu-week", async (req, res) => {
 
 
 app.post("/vote-ui", async (req, res) => {
-  const { token, willEat, choice } = req.body;
+  try {
+    const { token, willEat } = req.body;
+    let { choice } = req.body;
 
-  const votingWindow = getVotingWindow();
+    // Normalize checkbox values
+    if (!choice) choice = [];
+    if (!Array.isArray(choice)) choice = [choice];
 
-  if (!votingWindow.allowed) {
-    return res.send(
-      "⏰ Voting is closed. Voting opens at 6:00 PM for tomorrow’s meal."
-    );
-  }
+    const now = new Date();
+    const hour = now.getHours();
 
-  const user = await prisma.user.findUnique({
-    where: { token },
-  });
+    let voteDate = new Date();
 
-  if (!user) {
-    return res.status(404).send("Invalid user");
-  }
+    // ❌ Closed window: 10 AM – 6 PM
+    if (hour >= 10 && hour < 18) {
+      return res.send(
+        "⏰ Voting is closed. Voting opens at 6:00 PM for tomorrow’s meal."
+      );
+    }
 
-  // 📅 Decide voting date
-  const voteDate = new Date();
-  if (votingWindow.day === "TOMORROW") {
-    voteDate.setDate(voteDate.getDate() + 1);
-  }
-  voteDate.setHours(0, 0, 0, 0);
+    // Before 10 AM → today
+    if (hour < 10) {
+      voteDate.setHours(0, 0, 0, 0);
+    }
 
-  // 🚫 Weekend / holiday check
-  if (isWeekend(voteDate) || await isHoliday(voteDate)) {
-    return res.send("Voting disabled due to holiday / weekend.");
-  }
+    // After 6 PM → tomorrow
+    if (hour >= 18) {
+      voteDate.setDate(voteDate.getDate() + 1);
+      voteDate.setHours(0, 0, 0, 0);
+    }
 
-  // 📦 Subscription check
-  const subscription = await prisma.subscription.findFirst({
-    where: {
-      userId: user.id,
-      endDate: { gte: new Date() },
-    },
-  });
+    const user = await prisma.user.findUnique({
+      where: { token },
+    });
 
-  if (!subscription) {
-    return res.send("No active subscription.");
-  }
+    if (!user) {
+      return res.send("Invalid user");
+    }
 
-  if (subscription.mealsConsumed >= subscription.totalMeals) {
-    return res.send("Your meal quota is exhausted.");
-  }
-
-  // 🗳 Save vote
-  await prisma.vote.upsert({
-    where: {
-      userId_date: {
+    const subscription = await prisma.subscription.findFirst({
+      where: {
         userId: user.id,
-        date: voteDate,
-      },
-    },
-    update: {
-      willEat: willEat === "true",
-      choice,
-    },
-    create: {
-      userId: user.id,
-      date: voteDate,
-      willEat: willEat === "true",
-      choice,
-    },
-  });
-
-  // ➕ Increment meals only if eating
-  if (willEat === "true") {
-    await prisma.subscription.update({
-      where: { id: subscription.id },
-      data: {
-        mealsConsumed: { increment: 1 },
+        endDate: { gte: new Date() },
       },
     });
-  }
 
-  res.render("vote-success", {
-    day: votingWindow.day,
-    date: voteDate.toDateString(),
-  });
+    if (!subscription) {
+      return res.send("No active subscription.");
+    }
+
+    // Meal limit enforced by vote count (DB SAFE)
+    const usedMeals = await prisma.vote.count({
+      where: {
+        userId: user.id,
+        willEat: true,
+      },
+    });
+
+    if (usedMeals >= 20) {
+      return res.send("Your 20 meal quota is exhausted.");
+    }
+
+    if (willEat === "true" && choice.length === 0) {
+      return res.send("Please select at least one item.");
+    }
+
+    await prisma.vote.upsert({
+      where: {
+        userId_date: {
+          userId: user.id,
+          date: voteDate,
+        },
+      },
+      update: {
+        willEat: willEat === "true",
+        choice: choice.join(", "),
+      },
+      create: {
+        userId: user.id,
+        date: voteDate,
+        willEat: willEat === "true",
+        choice: choice.join(", "),
+      },
+    });
+
+    res.send("✅ Your vote has been recorded successfully!");
+
+  } catch (err) {
+    console.error("VOTE ERROR:", err);
+    res.status(500).send("Internal Server Error");
+  }
 });
+
 
 
 
@@ -683,6 +695,7 @@ const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
+
 
 
 

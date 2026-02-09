@@ -459,105 +459,97 @@ app.post("/admin/menu-week", async (req, res) => {
 
 
 app.post("/vote-ui", async (req, res) => {
+  try {
+    const { token, willEat } = req.body;
+    let { choice } = req.body;
 
-  // ⏰ 10:30 PM cutoff check
-  const now = new Date();
-  const cutoff = new Date();
-  cutoff.setHours(22, 30, 0, 0); // 10:30 PM
+    // Normalize choice to array
+    if (!choice) {
+      choice = [];
+    } else if (!Array.isArray(choice)) {
+      choice = [choice];
+    }
 
-  if (now > cutoff) {
-    return res.send("Order for tomorrow is closed after 10:30 PM.");
-  }
+    // ⏰ 10:30 PM cutoff
+    const now = new Date();
+    const cutoff = new Date();
+    cutoff.setHours(22, 30, 0, 0);
 
-  const { token, willEat, choice } = req.body;
+    if (now > cutoff) {
+      return res.send("Order for tomorrow is closed after 10:30 PM.");
+    }
 
-  // 👤 User check
-  const user = await prisma.user.findUnique({
-    where: { token },
-  });
+    const user = await prisma.user.findUnique({
+      where: { token }
+    });
 
-  if (!user) {
-    return res.status(404).send("Invalid user");
-  }
+    if (!user) {
+      return res.send("Invalid user");
+    }
 
-  // 📅 Tomorrow date
-  const tomorrow = new Date();
-  tomorrow.setDate(tomorrow.getDate() + 1);
-  tomorrow.setHours(0, 0, 0, 0);
+    // Tomorrow date
+    const tomorrow = new Date();
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    tomorrow.setHours(0, 0, 0, 0);
 
-  // 🚫 Holiday / weekend check
-  if (isWeekend(tomorrow) || await isHoliday(tomorrow)) {
-    return res.send("Voting is disabled due to holiday / weekend.");
-  }
+    // Active subscription check
+    const subscription = await prisma.subscription.findFirst({
+      where: {
+        userId: user.id,
+        endDate: { gte: new Date() }
+      }
+    });
 
-  // 📦 Active subscription check
-  const subscription = await prisma.subscription.findFirst({
-    where: {
-      userId: user.id,
-      endDate: {
-        gte: new Date(),
+    if (!subscription) {
+      return res.send("No active subscription.");
+    }
+
+    // Meal limit (20)
+    const usedMeals = await prisma.vote.count({
+      where: {
+        userId: user.id,
+        willEat: true
+      }
+    });
+
+    if (usedMeals >= 20) {
+      return res.send("Your 20 meal quota is exhausted.");
+    }
+
+    // Basic validation
+    if (willEat === "true" && choice.length === 0) {
+      return res.send("Please select at least one item.");
+    }
+
+    // Save vote
+    await prisma.vote.upsert({
+      where: {
+        userId_date: {
+          userId: user.id,
+          date: tomorrow
+        }
       },
-    },
-  });
-
-  if (!subscription) {
-    return res.send("No active subscription.");
-  }
-
-  // 🍽️ Meal quota check
-   const usedMeals = await prisma.vote.count({
-  where: {
-    userId: user.id,
-    willEat: true
-  }
-});
-
-if (usedMeals >= 20) {
-  return res.send("Your meal quota of 20 meals is exhausted.");
-}
-
-
-  // 🧠 Normalize selected choices
-  let selectedChoices = [];
-
-  if (Array.isArray(choice)) {
-    selectedChoices = choice;
-  } else if (choice) {
-    selectedChoices = [choice];
-  }
-
-// 🔒 Basic validation (temporary – DB compatible)
-if (!selectedChoices || selectedChoices.length === 0) {
-  return res.send("Please select at least one item.");
-}
-
-if (selectedChoices.length > 2) {
-  return res.send("You can select maximum two items.");
-}
-
-  // 🗳️ Save / update vote
-  await prisma.vote.upsert({
-    where: {
-      userId_date: {
+      update: {
+        willEat: willEat === "true",
+        choice: choice.join(", ")
+      },
+      create: {
         userId: user.id,
         date: tomorrow,
-      },
-    },
-    update: {
-      willEat: willEat === "true",
-      choice: selectedChoices.join(", "),
-    },
-    create: {
-      userId: user.id,
-      date: tomorrow,
-      willEat: willEat === "true",
-      choice: selectedChoices.join(", "),
-    },
-  });
+        willEat: willEat === "true",
+        choice: choice.join(", ")
+      }
+    });
 
-  // ✅ Success screen
-  res.render("vote-success");
+    // Success
+    res.send("✅ Your meal for tomorrow has been recorded!");
+
+  } catch (err) {
+    console.error("VOTE ERROR:", err);
+    res.status(500).send("Internal Server Error");
+  }
 });
+
 
 
 
@@ -635,6 +627,7 @@ const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
+
 
 
 

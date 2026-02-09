@@ -170,12 +170,16 @@ app.get("/u/:token", async (req, res) => {
   try {
     const { token } = req.params;
 
+    console.log("TOKEN:", token);
+
     const user = await prisma.user.findUnique({
       where: { token }
     });
 
+    console.log("USER:", user);
+
     if (!user) {
-      return res.status(404).send("Invalid or expired link");
+      return res.send("User not found");
     }
 
     const subscription = await prisma.subscription.findFirst({
@@ -187,9 +191,7 @@ app.get("/u/:token", async (req, res) => {
       }
     });
 
-    if (!subscription) {
-      return res.send("No active subscription found.");
-    }
+    console.log("SUBSCRIPTION:", subscription);
 
     const today = new Date();
     today.setHours(0, 0, 0, 0);
@@ -197,6 +199,8 @@ app.get("/u/:token", async (req, res) => {
     const menu = await prisma.menu.findFirst({
       where: { date: today }
     });
+
+    console.log("MENU:", menu);
 
     res.render("customer", {
       name: user.name,
@@ -206,10 +210,11 @@ app.get("/u/:token", async (req, res) => {
     });
 
   } catch (err) {
-    console.error("CUSTOMER PAGE ERROR:", err);
-    res.status(500).send("Internal Server Error");
+    console.error("LOGIN PAGE CRASH:", err);
+    res.status(500).send(err.message);
   }
 });
+
 
 
 
@@ -631,6 +636,7 @@ const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
+
 
 
 

@@ -201,12 +201,19 @@ app.get("/u/:token", async (req, res) => {
 
     console.log("MENU:", menu);
 
+    const tomorrow = new Date();
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    tomorrow.setHours(0, 0, 0, 0);
+
+
     res.render("customer", {
-      name: user.name,
-      token: user.token,
-      todayMenu: menu,
-      subscription
-    });
+    name: user.name,
+    token: user.token,
+    todayMenu: menu,
+    subscription,
+    voteDate: tomorrow
+});
+
 
   } catch (err) {
     console.error("LOGIN PAGE CRASH:", err);
@@ -671,6 +678,7 @@ const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
+
 
 
 

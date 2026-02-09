@@ -116,16 +116,16 @@ app.get("/users", async (req, res) => {
   res.json(users);
 });
 
-app.post("/users", async (req, res) => {
-  const user = await prisma.user.create({
-    data: {
-      name: req.body.name,
-      token: uuidv4(),
-    },
-  });
-
-  res.json(user);
+app.get("/users", async (req, res) => {
+  try {
+    const users = await prisma.user.findMany();
+    res.json(users);
+  } catch (err) {
+    console.error("USERS FETCH ERROR:", err);
+    res.status(500).send("Internal Server Error");
+  }
 });
+
 
 app.post("/subscribe", async (req, res) => {
   try {
@@ -631,6 +631,7 @@ const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
+
 
 
 

@@ -128,25 +128,47 @@ app.post("/users", async (req, res) => {
 });
 
 app.post("/subscribe", async (req, res) => {
-  const { userId, startDate, planType } = req.body;
+  try {
+    const { userId, startDate, planType } = req.body;
 
-  const start = new Date(startDate);
-  const end = new Date(start);
-  end.setDate(end.getDate() + 25); // 25-day validity
+    if (!userId || !startDate || !planType) {
+      return res.status(400).send("userId, startDate and planType are required");
+    }
 
-  const subscription = await prisma.subscription.create({
-    data: {
-      userId,
-      startDate: start,
-      endDate: end,
-      totalMeals: 20,
-      mealsConsumed: 0,
-      planType, // BASIC or PREMIUM
-    },
-  });
+    // Check user exists
+    const user = await prisma.user.findUnique({
+      where: { id: Number(userId) }
+    });
 
-  res.json(subscription);
+    if (!user) {
+      return res.status(404).send("User not found");
+    }
+
+    const start = new Date(startDate);
+    start.setHours(0, 0, 0, 0);
+
+    const end = new Date(start);
+    end.setDate(end.getDate() + 25); // 25-day validity
+
+    const subscription = await prisma.subscription.create({
+      data: {
+        userId: user.id,
+        startDate: start,
+        endDate: end,
+        totalMeals: 20,
+        mealsConsumed: 0,
+        planType: planType.toUpperCase()
+      }
+    });
+
+    res.json(subscription);
+
+  } catch (err) {
+    console.error("SUBSCRIBE ERROR:", err);
+    res.status(500).send("Internal Server Error: " + err.message);
+  }
 });
+
 
 
 
@@ -636,6 +658,7 @@ const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
+
 
 
 

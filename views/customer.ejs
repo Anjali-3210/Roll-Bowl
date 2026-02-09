@@ -1,16 +1,96 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+  <meta charset="UTF-8" />
   <title>Roll Bowl</title>
+  <link rel="stylesheet" href="/style.css" />
 </head>
+
 <body>
+  <div class="container">
 
-  <h1 style="color:#268d24;">Hello <%= name %></h1>
+    <!-- Logo -->
+    <img src="/rollbowllogo.png" alt="Roll Bowl Logo" class="logo" />
 
-  <p>This page loaded successfully.</p>
+    <!-- Greeting -->
+    <h1 class="greeting">Hello <%= name %></h1>
 
+    <!-- Subscription Info -->
+    <% if (subscription) { %>
+      <div class="card">
+        <p>
+          <strong>Subscription Start:</strong>
+          <%= new Date(subscription.startDate).toDateString() %>
+        </p>
+        <p>
+          <strong>Valid Till:</strong>
+          <%= new Date(subscription.endDate).toDateString() %>
+        </p>
+        <p><strong>Meal Limit:</strong> 20 meals</p>
+      </div>
+    <% } else { %>
+      <div class="card" style="color:red;">
+        No active subscription
+      </div>
+    <% } %>
+
+    <!-- Divider -->
+    <hr />
+
+    <!-- Menu + Voting -->
+    <% if (todayMenu) { %>
+
+      <h2>
+        Voting for
+        <br />
+        <span style="color:#268d24;">
+          Tomorrow
+        </span>
+      </h2>
+
+      <p style="font-size:13px;color:#666;">
+        Please confirm your meal before the cutoff time.
+      </p>
+
+      <form method="POST" action="/vote-ui">
+        <input type="hidden" name="token" value="<%= token %>" />
+
+        <% todayMenu.items.split(',').forEach(function(item) { %>
+          <div style="margin-bottom:8px;">
+            <input
+              type="checkbox"
+              name="choice"
+              value="<%= item.trim() %>"
+              id="<%= item.trim() %>"
+            />
+            <label for="<%= item.trim() %>">
+              <%= item.trim() %>
+            </label>
+          </div>
+        <% }); %>
+
+        <br />
+
+        <button class="btn-success" type="submit" name="willEat" value="true">
+          I will eat tomorrow
+        </button>
+
+        <button class="btn-accent" type="submit" name="willEat" value="false">
+          I will skip tomorrow
+        </button>
+      </form>
+
+    <% } else { %>
+
+      <p>No menu available at the moment.</p>
+
+    <% } %>
+
+  </div>
 </body>
 </html>
+
+
 
 
 

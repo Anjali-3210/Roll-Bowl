@@ -166,10 +166,6 @@ app.post("/subscribe", async (req, res) => {
   }
 });
 
-
-
-
-
 app.get("/u/:token", async (req, res) => {
   const { token } = req.params;
 
@@ -504,9 +500,17 @@ app.post("/vote-ui", async (req, res) => {
   }
 
   // 🍽️ Meal quota check
-  if (subscription.mealsConsumed >= subscription.totalMeals) {
-    return res.send("Your meal quota is exhausted.");
+   const usedMeals = await prisma.vote.count({
+  where: {
+    userId: user.id,
+    willEat: true
   }
+});
+
+if (usedMeals >= 20) {
+  return res.send("Your meal quota of 20 meals is exhausted.");
+}
+
 
   // 🧠 Normalize selected choices
   let selectedChoices = [];
@@ -563,18 +567,6 @@ app.post("/vote-ui", async (req, res) => {
       choice: selectedChoices.join(", "),
     },
   });
-
-  // ➕ Increment meals ONLY if eating
-  if (willEat === "true") {
-    await prisma.subscription.update({
-      where: { id: subscription.id },
-      data: {
-        mealsConsumed: {
-          increment: 1,
-        },
-      },
-    });
-  }
 
   // ✅ Success screen
   res.render("vote-success");
@@ -656,6 +648,7 @@ const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
+
 
 
 

@@ -32,6 +32,10 @@ h1 {
   margin-bottom: 6px;
 }
 
+.greeting {
+  color: #268d24; /* Green */
+}
+
 h2 {
   font-size: 16px;
   color: #268d24;
@@ -164,6 +168,7 @@ input[type="checkbox"] {
   transform: scale(1.2);
   margin-right: 8px;
 }
+
 
 
 

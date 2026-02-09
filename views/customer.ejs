@@ -13,20 +13,18 @@
       <img src="/rollbowllogo.png" alt="Roll Bowl Logo" class="logo" />
       <p class="subtitle">Healthy Choice, Zero Compromise</p>
 
-      <!-- SUBSCRIPTION DASHBOARD -->
       <div class="card">
-        <p><strong>Plan:</strong> <%= subscription.planType %></p>
-        <p><strong>Start Date:</strong> <%= subscription.startDate.toDateString() %></p>
-        <p><strong>Valid Till:</strong> <%= subscription.endDate.toDateString() %></p>
-        <p>
-          <strong>Meals Used:</strong>
-          <%= subscription.mealsConsumed %> / <%= subscription.totalMeals %>
-        </p>
-        <p>
-          <strong>Meals Remaining:</strong>
-          <%= subscription.totalMeals - subscription.mealsConsumed %>
-        </p>
-      </div>
+  <p><strong>Subscription Start:</strong>
+    <%= new Date(subscription.startDate).toDateString() %>
+  </p>
+
+  <p><strong>Valid Till:</strong>
+    <%= new Date(subscription.endDate).toDateString() %>
+  </p>
+
+  <p><strong>Meal Limit:</strong> 20 meals</p>
+</div>
+
 
       <!-- GREETING -->
       <h1>Hello <%= name %></h1>
@@ -89,6 +87,7 @@
     </div>
   </body>
 </html>
+
 
 
 

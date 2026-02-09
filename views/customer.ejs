@@ -31,6 +31,15 @@
 
     <hr />
 
+  <p style="color:#268d24; font-weight:600;">
+  <% if (votingDay === "TODAY") { %>
+    Voting for <%= voteDate %> (Today)
+  <% } else { %>
+    Voting for <%= voteDate %> (Tomorrow)
+  <% } %>
+</p>
+
+
     <% if (todayMenu) { %>
       <h2>
   Voting for:
@@ -74,6 +83,7 @@
   </div>
 </body>
 </html>
+
 
 
 

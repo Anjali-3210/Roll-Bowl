@@ -360,6 +360,30 @@ app.get("/admin", async (req, res) => {
     return res.status(403).send("Access denied");
   }
 
+  /* ---------------------------
+     SECTION 1: TOMORROW'S KITCHEN DATA
+  ---------------------------- */
+
+  const tomorrow = new Date();
+  tomorrow.setDate(tomorrow.getDate() + 1);
+  tomorrow.setHours(0, 0, 0, 0);
+
+  const votes = await prisma.vote.findMany({
+    where: {
+      date: tomorrow,
+      willEat: true
+    },
+    include: {
+      user: true
+    }
+  });
+
+  const totalMealsTomorrow = votes.length;
+
+  /* ---------------------------
+     SECTION 2: SUBSCRIPTION DATA
+  ---------------------------- */
+
   const users = await prisma.user.findMany({
     include: {
       subscription: true
@@ -369,7 +393,7 @@ app.get("/admin", async (req, res) => {
   const today = new Date();
   today.setHours(0, 0, 0, 0);
 
-  const data = [];
+  const subscriptionData = [];
 
   for (const user of users) {
     if (!user.subscription) continue;
@@ -389,7 +413,7 @@ app.get("/admin", async (req, res) => {
       Math.ceil((end - today) / (1000 * 60 * 60 * 24))
     );
 
-    data.push({
+    subscriptionData.push({
       name: user.name,
       phone: user.phone,
       startDate: user.subscription.startDate,
@@ -400,8 +424,13 @@ app.get("/admin", async (req, res) => {
     });
   }
 
-  res.render("admin", { users: data });
+  res.render("admin", {
+    totalMealsTomorrow,
+    votes,
+    subscriptions: subscriptionData
+  });
 });
+
 
 
 app.post("/admin/holiday", async (req, res) => {
@@ -642,6 +671,7 @@ const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
+
 
 
 

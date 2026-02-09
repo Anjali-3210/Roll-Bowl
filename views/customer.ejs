@@ -32,7 +32,20 @@
     <hr />
 
     <% if (todayMenu) { %>
-      <h2>Today's Menu</h2>
+      <h2>
+  Voting for:
+  <br>
+  <span style="color:#268d24;">
+    <%= voteDate.toLocaleDateString("en-IN", {
+      weekday: "long",
+      day: "numeric",
+      month: "long",
+      year: "numeric"
+    }) %>
+    (Tomorrow)
+  </span>
+</h2>
+
 
       <form method="POST" action="/vote-ui">
         <input type="hidden" name="token" value="<%= token %>" />
@@ -47,11 +60,11 @@
         <br />
 
         <button type="submit" name="willEat" value="true">
-          I will eat tomorrow
+          I will eat tomorrow😃
         </button>
 
         <button type="submit" name="willEat" value="false">
-          I will skip tomorrow
+          I will skip tomorrow😓
         </button>
       </form>
     <% } else { %>
@@ -61,6 +74,7 @@
   </div>
 </body>
 </html>
+
 
 
 

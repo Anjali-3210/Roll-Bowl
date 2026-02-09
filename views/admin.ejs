@@ -1,37 +1,72 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <title>Roll Bowl Admin</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="/style.css">
-  </head>
-  <body>
-<div class="container">
-<img src="/rollbowllogo.png" alt="Roll Bowl Logo" class="logo" />
-
+<head>
+  <title>Admin Dashboard</title>
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+  <div class="container">
     <h1>Admin Dashboard</h1>
 
-    <h2>Tomorrow Meal Count</h2>
-    <p>Total meals to prepare: <%= count %></p>
+    <!-- ======================
+         SECTION 1: KITCHEN VIEW
+    ======================= -->
 
-    <h2>Users Eating Tomorrow</h2>
+    <h2>Tomorrow's Kitchen Summary</h2>
 
-    <% if (users.length === 0) { %>
-      <p>No votes yet</p>
-    <% } else { %>
-      <ul>
-        <% users.forEach(u => { %>
-          <li>
-            <strong><%= u.name %></strong>
-            —
-            <em><%= u.choice || "No choice selected" %></em>
-          </li>
-        <% }) %>
-      </ul>
+    <div class="card">
+      <p><strong>Total Meals to Prepare:</strong> <%= totalMealsTomorrow %></p>
+    </div>
+
+    <% if (votes.length === 0) { %>
+      <p>No users eating tomorrow.</p>
     <% } %>
-</div>
-  </body>
+
+    <% votes.forEach(vote => { %>
+      <div class="card">
+        <p><strong>Name:</strong> <%= vote.user.name %></p>
+        <p><strong>Choice:</strong> <%= vote.choice %></p>
+      </div>
+    <% }) %>
+
+    <hr />
+
+    <!-- ======================
+         SECTION 2: SUBSCRIPTIONS
+    ======================= -->
+
+    <h2>Customer Subscription Status</h2>
+
+    <% if (subscriptions.length === 0) { %>
+      <p>No active subscriptions</p>
+    <% } %>
+
+    <% subscriptions.forEach(user => { %>
+      <div class="card">
+        <p><strong>Name:</strong> <%= user.name %></p>
+        <p><strong>Phone:</strong> <%= user.phone %></p>
+
+        <p>
+          <strong>Start Date:</strong>
+          <%= new Date(user.startDate).toDateString() %>
+        </p>
+
+        <p>
+          <strong>End Date:</strong>
+          <%= new Date(user.endDate).toDateString() %>
+        </p>
+
+        <p><strong>Days Remaining:</strong> <%= user.remainingDays %></p>
+        <p><strong>Meals Used:</strong> <%= user.mealsUsed %></p>
+        <p><strong>Meals Remaining:</strong> <%= user.mealsRemaining %></p>
+      </div>
+    <% }) %>
+
+  </div>
+</body>
 </html>
+
+
 
 
 

@@ -356,38 +356,53 @@ app.get("/admin/tomorrow-users", async (req, res) => {
 app.get("/admin", async (req, res) => {
   const adminKey = req.query.key;
 
-  if (adminKey !== "Rollbowl@0907") {
+  if (adminKey !== process.env.ADMIN_KEY) {
     return res.status(403).send("Access denied");
   }
 
-  const start = new Date();
-  start.setDate(start.getDate() + 1);
-  start.setHours(0, 0, 0, 0);
-
-  const end = new Date(start);
-  end.setHours(23, 59, 59, 999);
-
-  const votes = await prisma.vote.findMany({
-    where: {
-      date: {
-        gte: start,
-        lte: end,
-      },
-      willEat: true,
-    },
+  const users = await prisma.user.findMany({
     include: {
-      user: true,
-    },
+      subscription: true
+    }
   });
 
-  res.render("admin", {
-    count: votes.length,
-    users: votes.map(v => ({
-      name: v.user.name,
-      choice: v.choice,
-    })),
-  });
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  const data = [];
+
+  for (const user of users) {
+    if (!user.subscription) continue;
+
+    const usedMeals = await prisma.vote.count({
+      where: {
+        userId: user.id,
+        willEat: true
+      }
+    });
+
+    const end = new Date(user.subscription.endDate);
+    end.setHours(0, 0, 0, 0);
+
+    const remainingDays = Math.max(
+      0,
+      Math.ceil((end - today) / (1000 * 60 * 60 * 24))
+    );
+
+    data.push({
+      name: user.name,
+      phone: user.phone,
+      startDate: user.subscription.startDate,
+      endDate: user.subscription.endDate,
+      mealsUsed: usedMeals,
+      mealsRemaining: Math.max(0, 20 - usedMeals),
+      remainingDays
+    });
+  }
+
+  res.render("admin", { users: data });
 });
+
 
 app.post("/admin/holiday", async (req, res) => {
   const { date, reason } = req.body;
@@ -627,6 +642,7 @@ const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
+
 
 
 

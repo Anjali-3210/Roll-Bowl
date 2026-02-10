@@ -527,10 +527,11 @@ app.post("/vote-ui", async (req, res) => {
     const { token, willEat } = req.body;
     let { choice } = req.body;
 
-    // Normalize checkbox values
+    // 🔁 Normalize checkbox values
     if (!choice) choice = [];
     if (!Array.isArray(choice)) choice = [choice];
 
+    // ⏰ Voting time logic
     const now = new Date();
     const hour = now.getHours();
 
@@ -543,17 +544,18 @@ app.post("/vote-ui", async (req, res) => {
       );
     }
 
-    // Before 10 AM → today
+    // ✅ Before 10 AM → TODAY
     if (hour < 10) {
       voteDate.setHours(0, 0, 0, 0);
     }
 
-    // After 6 PM → tomorrow
+    // ✅ After 6 PM → TOMORROW
     if (hour >= 18) {
       voteDate.setDate(voteDate.getDate() + 1);
       voteDate.setHours(0, 0, 0, 0);
     }
 
+    // 👤 User check
     const user = await prisma.user.findUnique({
       where: { token },
     });
@@ -562,6 +564,7 @@ app.post("/vote-ui", async (req, res) => {
       return res.send("Invalid user");
     }
 
+    // 📦 Active subscription
     const subscription = await prisma.subscription.findFirst({
       where: {
         userId: user.id,
@@ -573,7 +576,7 @@ app.post("/vote-ui", async (req, res) => {
       return res.send("No active subscription.");
     }
 
-    // Meal limit enforced by vote count (DB SAFE)
+    // 🍽️ Meal limit (20 meals total)
     const usedMeals = await prisma.vote.count({
       where: {
         userId: user.id,
@@ -582,13 +585,26 @@ app.post("/vote-ui", async (req, res) => {
     });
 
     if (usedMeals >= 20) {
-      return res.send("Your 20 meal quota is exhausted.");
+      return res.send("Your 20-meal quota is exhausted.");
     }
 
+    // 🧾 Validation when eating
     if (willEat === "true" && choice.length === 0) {
       return res.send("Please select at least one item.");
     }
 
+    // 🔒 PLAN RULES
+    if (willEat === "true") {
+      if (subscription.plan === "SOLO" && choice.length !== 1) {
+        return res.send("SOLO plan allows only 1 item.");
+      }
+
+      if (subscription.plan === "PLUS" && choice.length !== 2) {
+        return res.send("PLUS plan allows exactly 2 items.");
+      }
+    }
+
+    // 🗳️ Save / Update vote
     await prisma.vote.upsert({
       where: {
         userId_date: {
@@ -608,6 +624,7 @@ app.post("/vote-ui", async (req, res) => {
       },
     });
 
+    // ✅ Success
     res.send("✅ Your vote has been recorded successfully!");
 
   } catch (err) {
@@ -695,6 +712,7 @@ const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
+
 
 
 

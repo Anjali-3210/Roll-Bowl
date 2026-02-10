@@ -533,7 +533,6 @@ app.post("/vote-ui", async (req, res) => {
 
     // ⏰ Voting time logic
     const now = new Date();
-    const now = new Date();
 
 // Convert to IST
 const istOffset = 5.5 * 60 * 60 * 1000;
@@ -718,6 +717,7 @@ const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
+
 
 
 

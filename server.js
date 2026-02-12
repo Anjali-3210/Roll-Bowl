@@ -1,5 +1,8 @@
 const express = require("express");
 const { PrismaClient } = require("@prisma/client");
+const prisma = new PrismaClient({
+  log: ["query", "error"]
+});
 const bodyParser = require("body-parser");
 const { v4: uuidv4 } = require("uuid");
 
@@ -746,6 +749,7 @@ const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
+
 
 
 

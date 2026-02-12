@@ -6,9 +6,9 @@
   "author": "Anjali",
   "main": "index.js",
   "scripts": {
-  "build": "npx prisma migrate deploy",
+  "build": "prisma generate",
   "start": "node server.js"
-},
+} 
   "dependencies": {
     "@prisma/client": "^6.19.1",
     "dotenv": "^17.2.3",

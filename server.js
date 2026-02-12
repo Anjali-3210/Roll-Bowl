@@ -142,6 +142,8 @@ app.get("/users", async (req, res) => {
 
 
 app.post("/subscribe", async (req, res) => {
+  console.log("SUBSCRIBE BODY:", req.body);
+
   try {
     const { userId, startDate, planType } = req.body;
 
@@ -744,6 +746,7 @@ const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
+
 
 
 

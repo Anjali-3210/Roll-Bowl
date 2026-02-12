@@ -449,6 +449,7 @@ app.get("/admin", async (req, res) => {
     subscriptionData.push({
       name: user.name,
       phone: user.phone,
+      planType: user.subscription.planType,
       startDate: user.subscription.startDate,
       endDate: user.subscription.endDate,
       mealsUsed: usedMeals,
@@ -743,6 +744,7 @@ const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
+
 
 
 

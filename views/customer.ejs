@@ -68,28 +68,40 @@
     <hr />
 
 <!-- Subscription Info -->
-    <% if (subscription) { %>
-      <div class="card">
-        <p>
-          <strong>Subscription Start:</strong>
-          <%= new Date(subscription.startDate).toDateString() %>
-        </p>
-        <p>
-          <strong>Valid Till:</strong>
-          <%= new Date(subscription.endDate).toDateString() %>
-        </p>
-        <p><strong>Meal Limit:</strong> 20 meals</p>
-      </div>
-    <% } else { %>
-      <div class="card" style="color:red;">
-        No active subscription
-      </div>
-    <% } %>
+   <% if (subscription) { %>
+  <div class="card">
+    <p><strong>Plan:</strong> <%= subscription.planType %></p>
+
+    <p>
+      <strong>Subscription:</strong><br>
+      <%= new Date(subscription.startDate).toDateString() %>
+      →
+      <%= new Date(subscription.endDate).toDateString() %>
+    </p>
+
+    <p>
+      <strong>Meals Used:</strong>
+      <%= subscription.mealsConsumed %> /
+      <%= subscription.totalMeals %>
+    </p>
+
+    <p>
+      <strong>Meals Remaining:</strong>
+      <%= subscription.totalMeals - subscription.mealsConsumed %>
+    </p>
+  </div>
+<% } else { %>
+  <div class="card" style="color:red;">
+    No active subscription
+  </div>
+<% } %>
+
 
 
   </div>
 </body>
 </html>
+
 
 
 

@@ -143,14 +143,21 @@ app.get("/users", async (req, res) => {
 
 app.post("/subscribe", async (req, res) => {
   try {
-    const { userId, startDate } = req.body;
+    const { userId, startDate, planType } = req.body;
 
-    if (!userId || !startDate) {
-      return res.status(400).send("userId and startDate are required");
+    if (!userId || !startDate || !planType) {
+      return res
+        .status(400)
+        .send("userId, startDate and planType are required");
+    }
+
+    // Only allow SOLO or PLUS
+    if (!["SOLO", "PLUS"].includes(planType)) {
+      return res.status(400).send("Invalid planType");
     }
 
     const user = await prisma.user.findUnique({
-      where: { id: Number(userId) }
+      where: { id: Number(userId) },
     });
 
     if (!user) {
@@ -167,8 +174,11 @@ app.post("/subscribe", async (req, res) => {
       data: {
         userId: user.id,
         startDate: start,
-        endDate: end
-      }
+        endDate: end,
+        planType: planType,      // ✅ ONLY ADDITION
+        totalMeals: 20,          // default
+        mealsConsumed: 0,        // default
+      },
     });
 
     res.json(subscription);
@@ -178,6 +188,7 @@ app.post("/subscribe", async (req, res) => {
     res.status(500).send("Internal Server Error: " + err.message);
   }
 });
+
 
 
 app.get("/u/:token", async (req, res) => {
@@ -717,6 +728,7 @@ const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
+
 
 
 

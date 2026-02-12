@@ -1,3 +1,4 @@
+/// force prisma regenerate
 enum PlanType {
   BASIC
   PREMIUM

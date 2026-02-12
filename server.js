@@ -609,16 +609,18 @@ const hour = istTime.getHours();
       return res.send("Please select at least one item.");
     }
 
-    // 🔒 PLAN RULES
-    if (willEat === "true") {
-      if (subscription.plan === "SOLO" && choice.length !== 1) {
-        return res.send("SOLO plan allows only 1 item.");
-      }
+   // 🔒 PLAN RULES
+if (willEat === "true") {
 
-      if (subscription.plan === "PLUS" && choice.length !== 2) {
-        return res.send("PLUS plan allows exactly 2 items.");
-      }
-    }
+  if (subscription.planType === "SOLO" && choice.length !== 1) {
+    return res.send("SOLO plan allows only 1 item.");
+  }
+
+  if (subscription.planType === "PLUS" && choice.length !== 2) {
+    return res.send("PLUS plan allows exactly 2 items.");
+  }
+}
+
 
     // 🗳️ Save / Update vote
     await prisma.vote.upsert({
@@ -639,6 +641,19 @@ const hour = istTime.getHours();
         choice: choice.join(", "),
       },
     });
+
+    // ➕ Increment mealsConsumed ONLY if eating
+if (willEat === "true") {
+  await prisma.subscription.update({
+    where: { id: subscription.id },
+    data: {
+      mealsConsumed: {
+        increment: 1,
+      },
+    },
+  });
+}
+
 
     // ✅ Success
     res.send("✅ Your vote has been recorded successfully!");
@@ -728,6 +743,7 @@ const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
+
 
 
 

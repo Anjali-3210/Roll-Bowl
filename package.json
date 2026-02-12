@@ -6,8 +6,7 @@
   "author": "Anjali",
   "main": "index.js",
   "scripts": {
-  "build": "prisma generate",
-  "start": "node server.js"
+  "start": "npx prisma generate && node server.js"
 },
   "dependencies": {
     "@prisma/client": "^6.19.1",
